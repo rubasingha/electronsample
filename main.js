@@ -191,10 +191,35 @@ var options = {
     landscape: false
 } 
 
+var options2 = { 
+    silent: false, 
+    printBackground: true, 
+    color: false, 
+    margin: { 
+        marginType: 'printableArea'
+    }, 
+    landscape: false, 
+    pagesPerSheet: 1, 
+    collate: false, 
+    copies: 1, 
+    header: 'Header of the Page', 
+    footer: 'Footer of the Page'
+} 
+
 function craetePDF(){
     var pdfcreatePath = path.join(__dirname, 'invoices/'+getNextInvoiceNumber()+'.pdf');
 
     console.log("pdf creating...");
+
+    mainWindow.loadURL("http://localhost:3000/"+getNextInvoiceNumber()+'.pdf');
+
+    mainWindow.webContents.on('did-finish-load', () => { 
+        mainWindow.webContents.print(options2, (success, failureReason) => { 
+            if (!success) console.log(failureReason); 
+            console.log('Print Initiated'); 
+        }); 
+    });
+
     mainWindow.webContents.printToPDF(options).then(data => { 
         fs.writeFile(pdfcreatePath, data, function (err) { 
             if (err) { 
