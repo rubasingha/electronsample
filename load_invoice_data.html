@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <style>
+            form{
+                padding-top: 20px;
+            }
+            table{
+                width: 100%;
+            }
+            table thead{
+                font-weight: bold;
+            }
+            .add-button-div{
+                padding-top: 30px;
+            }
+        </style>
+        <title>Enter Invoice Details</title>
+    </head>
+    <body>
+
+            <div class="container">
+                <div class="form-group">
+                    <label>Type:</label>
+                    <select class="form-control" id="rechung_type">
+                        <option value="Rechung">Rechung</option>
+                        <option value="Quatation">Quatation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Address:</label>
+                    <div class="row">
+                        <div class="col-md-2">
+                            <select class="form-control" id="herr_tag">
+                                <option value="Firma">Firma</option>
+                                <option value="Herr">Herr</option>
+                                <option value="Frau">Frau</option>
+                            </select>
+                        </div>
+                        <div class="col-md-10">
+                            <input type="text" id="name" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Bestellungsdatum:</label>
+                    <input type="date" id="bestelun_date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Rechnungnr:</label>
+                    <input type="text" id="rechnug_input" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Lieferdatum:</label>
+                    <input type="date" id="lie_date" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Versandart:</label>
+                    <input type="text" id="versandart_input" class="form-control">
+                </div>
+                <hr/>
+                <div class="row">
+                    <div class="col-md-3"><label>Anzahl:</label><input type="number" id="anzahl_input" class="form-control"></div>
+                    <div class="col-md-3"><label>Artikel:</label><input type="text" id="artikel_input" class="form-control"></div>
+                    <div class="col-md-3"><label>Einzelpreis in Fr.</label><input type="number" id="einzelpreis_input" class="form-control"></div>
+                    <div class="col-md-3 add-button-div"><button class="btn btn-info" onclick="addingRow();">Add</button></div>
+                </div>
+                <hr/>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="item-list">
+                            <thead>
+                                <tr>
+                                    <td>Anzahl</td>
+                                    <td>Artikel</td>
+                                    <td>Einzelpreis in Fr.</td>
+                                    <td>Gesamt in Fr.</td>
+                                    <td></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <hr/>
+                <div class="form-group">
+                    <label>Spezial Preis:</label>
+                    <input type="text" id="spezial_preis_input" class="form-control">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success" onclick="submitForm();">OK</button>
+                </div>
+            </div>
+
+    </body>
+</html>
+
+<script src="/js/jquery.min.js"></script>
+<script>
+// window.$ = window.jQuery = require('jquery');
+  
+  $(function() {
+    getValueFromSession();
+  });
+
+function getValueFromSession(){
+    $.ajax({
+      url: "http://localhost:3000/get_from_session",
+      type: 'get', dataType: 'json', async: false, contentType: "application/json",
+      data: "",
+      success: function(docs) {
+        console.log(docs.value);
+        loadDataToEnter(JSON.parse(docs.value));
+      } 
+    });
+}
+
+function loadDataToEnter(data){
+    console.log(data.data_body);
+    $("#versandart_input").val(data.data_body.versandart_input);
+    $("#rechung_type").val(data.data_body.rechung_type);
+    $("#herr_tag").val(data.data_body.herr_tag);
+    $("#name").val(data.data_body.name);
+    $("#bestelun_date").val(data.data_body.bestelun_date);
+    $("#rechnug_input").val(data.data_body.rechnug_input);
+    $("#lie_date").val(data.data_body.lie_date);
+    $("#versandart_input").val(data.data_body.versandart_input);
+    $("#spezial_preis_input").val(data.data_body.spezial_preis_input);
+    dataArray = data.data_body.item_list;
+    drawTable();
+}
+
+function drawTable(){
+    $(".item-list tbody").html('');
+    $.each(dataArray, function( index, data ) {
+        var ges_val = data.anzahl * data.einzelpreis;
+        $(".item-list tbody").append(
+            "<tr>"+
+                "<td>"+data.anzahl+"</td>"+
+                "<td>"+data.artikel+"</td>"+
+                "<td>"+data.einzelpreis+"</td>"+
+                "<td>"+ges_val+"</td>"+
+                "<td><button class='btn btn-danger' onclick='removeData("+index+");'>Remove</button></td>"+
+            "</tr>"
+        );
+    });
+}
+
+function submitForm(){
+        //e.preventDefault();
+        const rechung_type = document.querySelector("#rechung_type").value;
+        const herr_tag = document.querySelector("#herr_tag").value;
+        const name = document.querySelector("#name").value;
+        const bestelun_date = document.querySelector("#bestelun_date").value;
+        const rechnug_input = document.querySelector("#rechnug_input").value;
+        const lie_date = document.querySelector("#lie_date").value;
+        const versandart_input = document.querySelector("#versandart_input").value;
+        const spezial_preis_input = document.querySelector("#spezial_preis_input").value;
+
+        if(name == ""){
+            $("#name").addClass("is-invalid");
+            return false;
+        }else{
+            $("#name").removeClass("is-invalid");
+        }
+
+        if(bestelun_date == ""){
+            $("#bestelun_date").addClass("is-invalid");
+            return false;
+        }else{
+            $("#bestelun_date").removeClass("is-invalid");
+        }
+
+        if(rechnug_input == ""){
+            $("#rechnug_input").addClass("is-invalid");
+            return false;
+        }else{
+            $("#rechnug_input").removeClass("is-invalid");
+        }
+
+        if(lie_date == ""){
+            $("#lie_date").addClass("is-invalid");
+            return false;
+        }else{
+            $("#lie_date").removeClass("is-invalid");
+        }
+
+        if(versandart_input == ""){
+            $("#versandart_input").addClass("is-invalid");
+            return false;
+        }else{
+            $("#versandart_input").removeClass("is-invalid");
+        }
+
+        if(dataArray.length == 0){
+            $("#anzahl_input").addClass("is-invalid");
+            $("#artikel_input").addClass("is-invalid");
+            $("#einzelpreis_input").addClass("is-invalid");
+            return false;
+        }else{
+            $("#anzahl_input").removeClass("is-invalid");
+            $("#artikel_input").removeClass("is-invalid");
+            $("#einzelpreis_input").removeClass("is-invalid");
+        }
+
+        let requestbody = {
+            "rechung_type":rechung_type,
+            "herr_tag":herr_tag,
+            "name":name,
+            "bestelun_date":bestelun_date,
+            "rechnug_input":rechnug_input,
+            "lie_date":lie_date,
+            "versandart_input":versandart_input,
+            "spezial_preis_input":spezial_preis_input,
+            "item_list":dataArray
+        }
+
+        var doc = { today: new Date()
+            , file_name: rechnug_input+'.pdf'
+            , data_body: requestbody
+        };
+
+        $.ajax({
+            url: "http://localhost:3000/set_to_session",
+            type: 'get', dataType: 'json', async: false, contentType: "application/json",
+            data: {"value":JSON.stringify(doc)},
+            success: function(response) {
+                console.log("saved to session, now updating invoice number");
+                $.ajax({
+                    url: "http://localhost:3000/update_invoice_number",
+                    type: 'get', dataType: 'json', async: false, contentType: "application/json",
+                    data: '',
+                    success: function(response) {
+                        console.log("invoice number updated, now saving to nedb");
+                        $.ajax({
+                            url: "http://localhost:3000/save_invoice_data",
+                            type: 'get', dataType: 'json', async: false, contentType: "application/json",
+                            data: {"newdoc":doc},
+                            success: function(response) {
+                                console.log("invoice data saved, now redirecting to main invoice");
+                                window.location.href = "http://localhost:3000/load_main_window";
+                            } 
+                        });
+                    } 
+                });
+            } 
+        });
+
+    }
+
+    function addingRow(){
+        var anzahl_val = $("#anzahl_input").val();
+        var artikel_val = $("#artikel_input").val();
+        var einzelpreis_val = $("#einzelpreis_input").val();
+
+        if(anzahl_val == ''){
+            $("#anzahl_input").addClass("is-invalid");
+            return false;
+        }else{
+            $("#anzahl_input").removeClass("is-invalid");
+        } 
+        
+        if(artikel_val == ''){
+            $("#artikel_input").addClass("is-invalid");
+            return false;
+        }else{
+            $("#artikel_input").removeClass("is-invalid");
+        } 
+
+        if(einzelpreis_val == ''){
+            $("#einzelpreis_input").addClass("is-invalid");
+            return false;
+        }else{
+            $("#einzelpreis_input").removeClass("is-invalid");
+        } 
+
+        var row = {
+            anzahl:anzahl_val,
+            artikel:artikel_val,
+            einzelpreis:einzelpreis_val
+        };
+
+        dataArray.push(row);
+
+        $("#anzahl_input").val('');
+        $("#artikel_input").val('');
+        $("#einzelpreis_input").val('');
+
+        drawTable();
+    }
+
+    function drawTable(){
+        $(".item-list tbody").html('');
+        $.each(dataArray, function( index, data ) {
+            var ges_val = data.anzahl * data.einzelpreis;
+            $(".item-list tbody").append(
+                "<tr>"+
+                    "<td>"+data.anzahl+"</td>"+
+                    "<td>"+data.artikel+"</td>"+
+                    "<td>"+data.einzelpreis+"</td>"+
+                    "<td>"+ges_val+"</td>"+
+                    "<td><button class='btn btn-danger' onclick='removeData("+index+");'>Remove</button></td>"+
+                "</tr>"
+            );
+        });
+    }
+
+    function removeData($index){
+        console.log("removing----"+$index);
+        dataArray.splice($index,1);
+
+        drawTable();
+    }
+    
+</script>

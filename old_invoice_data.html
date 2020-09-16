@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>History</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel='stylesheet' href='mystyle.css'>
+    <style>
+      #invoice_list{
+        padding:10px 20px 10px 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="invoice_list">
+      <div class="row">
+        <div class="col-md-3">
+          <h5>File Name</h5>
+        </div>
+        <div class="col-md-3">
+          <h5>Created Date</h5>
+        </div>
+        <div class="col-md-5">
+          <h5>Summary</h5>
+        </div>
+        <div class="col-md-1">
+          <h5>Option</h5>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script src="/js/jquery.min.js"></script>
+<script>
+    
+// window.$ = window.jQuery = require('jquery');
+  
+$(function() {
+  getDocsList();
+});
+
+function getDocsList(){
+  $.ajax({
+      url: "http://localhost:3000/get_old_invoice_data",
+      type: 'get', dataType: 'json', async: false, contentType: "application/json",
+      data: "",
+      success: function(docs) {
+        console.log(docs);
+        docs.forEach(function(data){
+          $("#invoice_list").append(
+            '<div class="row">'+
+              '<div class="col-md-3">'+
+                data.file_name+
+              '</div>'+
+              '<div class="col-md-3">'+
+                data.today.toString().slice(0,-30)+
+              '</div>'+
+              '<div class="col-md-5">'+
+                JSON.stringify(data.data_body)+
+              '</div>'+
+              '<div class="col-md-1">'+
+                "<a href='http://localhost:3000/load_invoice_data?id="+data._id+"'><button class='float-right btn btn-success'>Load</button></a>"+
+              '</div>'+
+            '</div>'
+          );
+            //$("#invoice_list").append(data.file_name+"<button class='float-right' onclick='loadData(\""+data._id+"\")'>Load</button><hr/>");
+        });
+      } 
+    });
+}
+
+</script>

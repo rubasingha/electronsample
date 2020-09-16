@@ -1,0 +1,57 @@
+{
+  "name": "EUComputerInvoice",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "dist": "build",
+    "start": "electron ."
+  },
+  "author": "TEST",
+  "license": "MIT",
+  "build": {
+    "asar": false,
+    "dmg": {
+      "contents": [
+        {
+          "x": 110,
+          "y": 150
+        },
+        {
+          "x": 240,
+          "y": 150,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "win": {
+      "target": "nsis",
+      "requestedExecutionLevel": "requireAdministrator",
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "guid": "eb1a0fbb-fc70-428e-97f1-fa7080894806",
+      "oneClick": true,
+      "perMachine": true
+    }
+  },
+  "dependencies": {
+    "boostrap": "^2.0.0",
+    "bootstrap": "^4.5.2",
+    "express": "^4.17.1",
+    "jquery": "^3.5.1",
+    "nedb": "^1.8.0",
+    "popper.js": "^1.16.1"
+  },
+  "devDependencies": {
+    "electron": "^10.1.1",
+    "electron-builder": "^20.44.4"
+  }
+}

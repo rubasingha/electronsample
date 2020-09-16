@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+        <style>
+            .eu-header{
+                font-weight: bold;
+            }
+            .herr-name{
+                padding-top: 170px;
+            }
+            .title-header-container{
+                padding-top: 80px;
+                padding-bottom: 20px;
+            }
+            .title-header{
+                font-weight: bold;
+                float: left;
+                padding-right: 5px;
+            }
+            .nr-tag{
+                padding-top: 5px;
+            }
+            .item-collection-label{
+                padding-top: 12px;
+            }
+            .item-list{
+                width: 100%;
+            }
+            .item-list thead{
+                font-weight: bold;
+            }
+            .sign-panel{
+                padding-top: 30px;
+            }
+            .footer-panel{
+                padding-top: 100px;
+                padding-bottom: 25px;
+            }
+        </style>
+        <title>My Sample App</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <img src="/images/eu_com_icon.png" />
+                    <h4 class="eu-header">EU-COMPUTER</h4>
+                </div>
+                <div class="col-md-6 herr-name">
+                    <div id="herr_tag">----</div>
+                    <div id="name">--------------------</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 title-header-container">
+                    <div class="title-header" id="rechung_type">Rechung</div><div class="float-left">Nr:&nbsp;</div><div id="rechnug_input">-----------------</div>
+                </div>
+            </div>
+            <div class="row item-collection-label">
+                <div class="col-md-12">
+                    <div>Gemäss Ihrem Auftrag stellen wir Ihnen folgende Rechnung</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="item-list">
+                        <thead>
+                            <tr>
+                                <td>Anzahl</td>
+                                <td>Artikel</td>
+                                <td>Einzelpreis in Fr.</td>
+                                <td>Gesamt in Fr.</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <hr/>
+                    <div class="col-md-9 float-left">Total ohne MWST in CHF</div>
+                    <div class="col-md-3 float-right" id="item_list_total">--------</div>
+                </div>
+                <div class="col-md-12">
+                    <div class="col-md-9 float-left">Total MWST in CHF</div>
+                    <div class="col-md-3 float-right" id="calc_amount">--------</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <hr/>
+                    <div class="col-md-9 float-left">Total mit MWST in CHF</div>
+                    <div class="col-md-3 float-right" id="sub_total">--------</div>
+                </div>
+                <div class="col-md-12">
+                    <div class="col-md-9 float-left">Spezialpreis in Fr.</div>
+                    <div class="col-md-3 float-right" id="spezial_preis_input">--------</div>
+                </div>
+            </div>
+            <div class="row sign-panel">
+                <div class="col-md-10">
+                    Ware wie geliefert erhalten:&nbsp; ____________
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
+
+<script src="/js/jquery.min.js"></script>
+<script>
+    // window.$ = window.jQuery = require('jquery');
+  
+    $(function() {
+        getValueFromSession();
+    });
+
+    function getValueFromSession(){
+        $.ajax({
+            url: "http://localhost:3000/get_from_session",
+            type: 'get', dataType: 'json', async: false, contentType: "application/json",
+            data: "",
+            success: function(docs) {
+                console.log(docs.value);
+                loadDataToEnter(JSON.parse(docs.value));
+            } 
+        });
+    }
+
+    function loadDataToEnter(data){
+        console.log(data);
+        var item = data.data_body;
+        $("#rechung_type").html(item.rechung_type);
+        $("#herr_tag").html(item.herr_tag);
+        $("#name").html(item.name);
+        $("#bestelun_date").html(item.bestelun_date);
+        $("#rechnug_input").html(item.rechnug_input);
+        $("#lie_date").html(item.lie_date);
+        $("#versandart_input").html(item.versandart_input);
+        $("#spezial_preis_input").html(item.spezial_preis_input);
+
+        drawTable(item.item_list);
+    }
+
+    function drawTable(dataArray){
+        $(".item-list tbody").html('');
+        var item_sum = 0;
+        $.each(dataArray, function( index, data ) {
+            var ges_val = data.anzahl * data.einzelpreis;
+            item_sum = item_sum + ges_val;
+            $(".item-list tbody").append(
+                "<tr>"+
+                    "<td>"+data.anzahl+"</td>"+
+                    "<td>"+data.artikel+"</td>"+
+                    "<td>"+data.einzelpreis+"</td>"+
+                    "<td>"+ges_val.toFixed(2)+"</td>"+
+                "</tr>"
+            );
+        });
+
+        var calc_value = (item_sum*25)/100;
+        $("#item_list_total").html(item_sum.toFixed(2));
+        $("#calc_amount").html(calc_value.toFixed(2));
+        $("#sub_total").html((calc_value+item_sum).toFixed(2));
+    }
+
+</script>

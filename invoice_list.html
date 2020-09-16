@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>History</title>
+    <link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css">
+    <link rel='stylesheet' href='/css/mystyle.css'>
+    <style>
+      #invoice_list{
+        padding:10px 20px 10px 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="invoice_list">
+      <div class="row">
+        <div class="col-md-4">
+          <h5>File Name</h5>
+        </div>
+        <div class="col-md-5">
+          <h5>Created Date</h5>
+        </div>
+        <div class="col-md-2">
+          <h5>Size</h5>
+        </div>
+        <div class="col-md-1">
+          <h5>Option</h5>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
+
+<script src="/js/jquery.min.js"></script>
+<script>
+
+//window.$ = window.jQuery = require('jquery');
+  
+$(function() {
+  getFileList();
+});
+
+function getFileList(){
+  $.ajax({
+      url: "http://localhost:3000/get_generated_invoices_list",
+      type: 'get', dataType: 'json', async: false, contentType: "application/json",
+      data: "",
+      success: function(response) {
+        console.log(response);
+        $.each(response, function( index, value ) {
+          $("#invoice_list").append(
+            '<div class="row">'+
+              '<div class="col-md-4">'+
+                value.file+
+              '</div>'+
+              '<div class="col-md-5">'+
+                value.created_time+
+              '</div>'+
+              '<div class="col-md-2">'+
+                value.file_size+
+              '</div>'+
+              '<div class="col-md-1">'+
+                "<a href='"+value.file+"' target='_blank'><button class='float-right btn btn-success'>Open</button></a>"+
+              '</div>'+
+            '</div>'
+          );
+        });
+      } 
+    });
+}
+
+</script>
